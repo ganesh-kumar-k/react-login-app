@@ -17,14 +17,60 @@ class Login extends React.Component {
 
     componentDidMount = () => {
         firebase.firestore().collection('users').onSnapshot((snapshot)=>{
-            const users = snapshot.docs.map((user)=>{
+            snapshot.docs.map((user)=>{
                 this.state.allUsers.push(user.data());
             });
         });
     }
 
+    fieldValidation = () => {
+        let isValid = true;
+        let fields = ["inputEmailUserName","inputPassword"];
+        let focusField, count = 0;
+        fields.forEach((field)=>{
+            let input = document.getElementById(field);
+            input.classList.remove("border-danger");
+            if(!input.value){
+                input.classList.add("border-danger");
+                isValid = false;
+                if(count === 0){
+                    focusField = input;
+                    count++;
+                }
+            }
+        });
+        if(!isValid){
+            focusField.focus();
+            this.swtoast("warning", "Username/Password should be mandatory")
+        }
+        return isValid
+    }
+
+    swtoast = (icon, title) => {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            onOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+          })
+          
+        Toast.fire({
+            icon: icon,
+            title: title
+        });
+    }
+
     signin = (event) => {
         event.preventDefault();
+        const fieldvalidation = this.fieldValidation();
+        if(!fieldvalidation){
+            return false;
+        }
         let userName = document.getElementById("inputEmailUserName").value;
         let passWord = document.getElementById("inputPassword").value;
         const validationResult = this.validateAccount(userName,passWord);
@@ -36,24 +82,7 @@ class Login extends React.Component {
                 footer: "<a href='#' title='"+validationResult.information+"'>Why do I have this issue?</a>"
               })
         }else{
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                onOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer)
-                  toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-              })
-              
-              Toast.fire({
-                icon: 'success',
-                title: 'Signed in successfully'
-              });
-
-              //this.registerUser();
+            this.swtoast("success", "Signed in successfully");
         }
     }
 

@@ -4,18 +4,82 @@ import {
   Link
 } from "react-router-dom";
 import firebase from '../../Firebase/Firebase_Config';
+import Swal from 'sweetalert2';
 
 class Registration extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      countries : ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cruise Ship","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyz Republic","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Satellite","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","South Africa","South Korea","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","St. Lucia","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Uganda","Ukraine","United Arab Emirates","United Kingdom","Uruguay","Uzbekistan","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"]
+      countries : ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cruise Ship","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyz Republic","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Satellite","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","South Africa","South Korea","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","St. Lucia","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Uganda","Ukraine","United Arab Emirates","United Kingdom","Uruguay","Uzbekistan","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"],
+      allUserNames : []
     }
+    this.checkUserName = this.checkUserName.bind(this);
   }
 
-  registerUser = (event, level) => {
+  componentDidMount = ()=> {
+      firebase.firestore().collection('users').onSnapshot((snapshot)=>{
+        snapshot.docs.map((user)=>{
+            let data = user.data();
+            if(data.username){
+                this.state.allUserNames.push(data.username);
+            }
+        });
+      });
+      document.getElementById("user_un").addEventListener("blur",(event) => this.checkUserName(event),false);
+  }
+
+  checkUserName = (e) => {
+    console.log(e);
+  }
+
+  swtoast = (icon, title) => {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        onOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+    Toast.fire({
+        icon: icon,
+        title: title
+    });
+  }
+
+  fieldValidation = (level) => {
+    let isValid = true;
+    let fields = ["_fn","_ln","_pass","_conpass","_country","_un","_mail","_phone","_ques","_ans"];
+    let focusField, count = 0;
+    fields.forEach((field)=>{
+        let input = document.getElementById(level+field);
+        input.classList.remove("border-danger");
+        if(!input.value){
+            input.classList.add("border-danger");
+            isValid = false;
+            if(count === 0){
+                focusField = input;
+                count++;
+            }
+        }
+    });
+    if(!isValid){
+        focusField.focus();
+        this.swtoast("warning", "Please fill all the mandatory fields")
+    }
+    return isValid
+  }
+
+  registerUser = async (event, level) => {
     event.preventDefault();
-    console.log(level);
+    const fieldValidation = this.fieldValidation(level);
+    if(!fieldValidation){
+        return false;
+    }
     firebase.firestore().collection('users').add({
         firstname : document.getElementById(level+"_fn").value,
         lastname : document.getElementById(level+"_ln").value,
@@ -30,7 +94,7 @@ class Registration extends React.Component{
     }).catch((error)=>{
         console.log(error)
     });
-}
+  }
 
   render(){
     return(
@@ -71,7 +135,7 @@ class Registration extends React.Component{
                                         </div>
                                         <div className="form-group">
                                             <select className="form-control" id="user_country">
-                                                <option className="hidden"  selected disabled>Please select your country</option>
+                                                <option className="hidden" value="" selected disabled>Please select your country</option>
                                                 {this.state.countries.map((country)=>{
                                                   return(
                                                     <option value={country}>{country}</option>
@@ -104,10 +168,10 @@ class Registration extends React.Component{
                                         </div>
                                         <div className="form-group">
                                             <select className="form-control" id="user_ques">
-                                                <option className="hidden"  selected disabled>Please select your Sequrity Question</option>
-                                                <option>What is your Birthdate?</option>
-                                                <option>What is Your old Phone Number</option>
-                                                <option>What is your Pet Name?</option>
+                                                <option value="" className="hidden"  selected disabled>Please select your Sequrity Question</option>
+                                                <option value="1">What is your Birthdate?</option>
+                                                <option value="2">What is Your old Phone Number</option>
+                                                <option value="3">What is your Pet Name?</option>
                                             </select>
                                         </div>
                                         <div className="form-group">
@@ -136,7 +200,7 @@ class Registration extends React.Component{
                                         </div>
                                         <div className="form-group">
                                             <select className="form-control" id="admin_country">
-                                                <option className="hidden"  selected disabled>Please select your country</option>
+                                                <option className="hidden" value="" selected disabled>Please select your country</option>
                                                 {this.state.countries.map((country)=>{
                                                   return(
                                                     <option value={country}>{country}</option>
@@ -157,10 +221,10 @@ class Registration extends React.Component{
                                         </div>
                                         <div className="form-group">
                                             <select className="form-control" id="admin_ques">
-                                                <option className="hidden"  selected disabled>Please select your Sequrity Question</option>
-                                                <option>What is your Birthdate?</option>
-                                                <option>What is Your old Phone Number</option>
-                                                <option>What is your Pet Name?</option>
+                                                <option value="" className="hidden"  selected disabled>Please select your Sequrity Question</option>
+                                                <option value="1">What is your Birthdate?</option>
+                                                <option value="2">What is Your old Phone Number</option>
+                                                <option value="3">What is your Pet Name?</option>
                                             </select>
                                         </div>
                                         <div className="form-group">
