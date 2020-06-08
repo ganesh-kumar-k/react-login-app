@@ -40,7 +40,7 @@ class Registration extends React.Component{
                     <div className="col-md-3 register-left">
                         <img src="https://image.ibb.co/n7oTvU/logo_white.png" alt=""/>
                         <h3>Welcome</h3>
-                        <p>You are 30 seconds away from earning your own money!</p>
+                        <p>You are 30 seconds away from accessing our application!</p>
                         <button type="submit" name=""><Link to="/" className="Register-account">Login</Link></button><br/>
                     </div>
                     <div className="col-md-9 register-right">

@@ -9,7 +9,7 @@ class App extends React.Component {
     return (
       <React.Fragment>
         <div className="App">
-        <Router>
+        <Router basename={process.env.PUBLIC_URL}>
             <Route exact path='/' component={Login}></Route>
             <Route path='/Registration' component={Registration}></Route>
         </Router>
