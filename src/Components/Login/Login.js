@@ -124,6 +124,7 @@ class Login extends React.Component {
                         </div>
                         <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" onClick={this.signin.bind(this)}>Sign in</button>
                     </form>
+                    <Link to="/Dashboard" className="Register-account">Skip Login</Link>
                     <a href="#" className="forgot-password">
                         Forgot the password?
                     </a>
