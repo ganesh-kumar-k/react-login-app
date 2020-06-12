@@ -1,27 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "797ff9fbe3440372907a779780adfddf",
+    "revision": "0626db84ef77e5ecaedefbfb14d336d5",
     "url": "/react-login-app/index.html"
   },
   {
-    "revision": "1f609911218a0022c0d4",
-    "url": "/react-login-app/static/css/2.af3c1da9.chunk.css"
+    "revision": "e896033003d75d99cc73",
+    "url": "/react-login-app/static/css/main.7c674340.chunk.css"
   },
   {
-    "revision": "b857bc360ced33bc6397",
-    "url": "/react-login-app/static/css/main.99f081c7.chunk.css"
-  },
-  {
-    "revision": "1f609911218a0022c0d4",
-    "url": "/react-login-app/static/js/2.e3b00a38.chunk.js"
+    "revision": "2c78ba2aa3323ef24d03",
+    "url": "/react-login-app/static/js/2.120bd3b8.chunk.js"
   },
   {
     "revision": "0e7c1845565a99b5d7279e7ce9d9dcbb",
-    "url": "/react-login-app/static/js/2.e3b00a38.chunk.js.LICENSE.txt"
+    "url": "/react-login-app/static/js/2.120bd3b8.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "b857bc360ced33bc6397",
-    "url": "/react-login-app/static/js/main.80b4ac66.chunk.js"
+    "revision": "e896033003d75d99cc73",
+    "url": "/react-login-app/static/js/main.f8b9c1fe.chunk.js"
   },
   {
     "revision": "223c20b3262d7b895b94",
