@@ -3,6 +3,7 @@ import SideBar from './sidebar';
 import Main from './main';
 import './assets/dashboard.css';
 import './assets/font-awesome.css';
+import './assets/nunito-font.css';
 
 export default class Dashboard extends React.Component{
     constructor(props){
@@ -15,13 +16,7 @@ export default class Dashboard extends React.Component{
     render(){
         return(
           <React.Fragment>
-            <div class="wrapper">
-                <SideBar></SideBar>
-                {/* <!-- Content Wrapper --> */}
-                <div id="content-wrapper" class="d-flex flex-column">
-                  <Main></Main>
-                </div>
-            </div>
+            <Main></Main>
             {/* <!-- Scroll to Top Button--> */}
             <a class="scroll-to-top rounded" href="#page-top">
               <i class="fas fa-angle-up"></i>

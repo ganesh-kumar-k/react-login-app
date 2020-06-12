@@ -1,8 +1,8 @@
 import React from 'react';
 import {BrowserRouter as Router,Route,Switch} from 'react-router-dom';
-import './App.css';
-import Login from "../Login/Login";
-import Registration from "../Login/Registration/Registration";
+import './index.css';
+import Login from "../Login";
+import Registration from "../Login/Registration";
 import Dashboard from "../Dashboard"
 
 class App extends React.Component {

@@ -81,7 +81,7 @@ body {
     color: #fff;
 }
 
-.card-container.card {
+.login-main .card-container.card {
     max-width: 350px;
     padding: 40px 40px;
 }
@@ -98,7 +98,7 @@ body {
 /*
  * Card component
  */
-.card {
+.login-main .card {
     background-color: #F7F7F7;
     /* just in case there no content*/
     padding: 20px 25px 30px;

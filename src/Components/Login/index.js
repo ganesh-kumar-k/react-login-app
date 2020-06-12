@@ -1,5 +1,5 @@
 import React from 'react';
-import "./Login.css";
+import "./index.css";
 import Swal from 'sweetalert2';
 import firebase from '../Firebase/Firebase_Config';
 import {
@@ -107,7 +107,7 @@ class Login extends React.Component {
                     <p>Login or register from here to access.</p>
                 </div>
             </div>
-            <div className="main">
+            <div className="main login-main">
               <div className="col-md-6 col-sm-12 login-container">
                 <div className="card card-container">
                     {/*</div><img className="profile-img-card" src="//lh3.googleusercontent.com/-6V8xOA6M7BA/AAAAAAAAAAI/AAAAAAAAAAA/rzlHcD0KYwo/photo.jpg?sz=120" alt="" /> */}
