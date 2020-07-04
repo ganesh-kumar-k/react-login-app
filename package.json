@@ -1,7 +1,7 @@
 {
   "homepage": "http://vacuum-hub.github.io/react-login-app/",
   "name": "react-login-app",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "dependencies": {
     "@sweetalert/with-react": "^0.1.1",

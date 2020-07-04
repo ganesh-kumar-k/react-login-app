@@ -1,5 +1,10 @@
 import React from 'react';
-import SideBar from './sidebar';
+import {
+  Link,
+  Redirect
+} from "react-router-dom";
+import Swal from 'sweetalert2';
+
 import Main from './main';
 import './assets/dashboard.css';
 import './assets/font-awesome.css';
@@ -8,15 +13,20 @@ import './assets/nunito-font.css';
 export default class Dashboard extends React.Component{
     constructor(props){
         super(props);
+        this.state = {
+          user : this.props.location.user,
+          login : true
+        }
     }
 
     componentDidMount = () => {
+      console.log(this.state.user);
     }
 
     render(){
         return(
           <React.Fragment>
-            <Main></Main>
+            <Main user={this.state.user}></Main>
             {/* <!-- Scroll to Top Button--> */}
             <a class="scroll-to-top rounded" href="#page-top">
               <i class="fas fa-angle-up"></i>
@@ -35,11 +45,12 @@ export default class Dashboard extends React.Component{
                   <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                   <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <Link to="/" className="btn btn-primary">Logout</Link>
                   </div>
                 </div>
               </div>
             </div>
+            {(!this.state.login) ? <Redirect to={{pathname:"/"}} push></Redirect> : ""}
          </React.Fragment>
         );
     };

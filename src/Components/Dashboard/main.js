@@ -1,7 +1,41 @@
 import React from 'react';
+import Swal from 'sweetalert2';
 import SideBar from './sidebar';
 import Footer from './footer';
-const Main = () => {
+
+const logout = () => {
+  Swal.fire({
+    title: 'Ready to Leave?',
+    text: "Select 'Logout' below if you are ready to end your current session.",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, Logout!'
+  }).then((result) => {
+    if (result.value) {
+      this.setState({login:false});
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        onOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
+      
+      Toast.fire({
+        icon: 'success',
+        title: 'Signed in successfully'
+      })
+    }
+  })
+}
+
+const Main = (props) => {
     return(
       <div id="wrapper">
         {/* Sidebar */}
@@ -156,7 +190,7 @@ const Main = () => {
                 {/* Nav Item - User Information */}
                 <li className="nav-item dropdown no-arrow">
                   <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span className="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
+                      <span className="mr-2 d-none d-lg-inline text-gray-600 small">{(props.user)?props.user.firstname:"Guest User"}</span>
                     <img className="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60" />
                   </a>
                   {/* Dropdown - User Information */}

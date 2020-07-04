@@ -3,15 +3,18 @@ import "./index.css";
 import Swal from 'sweetalert2';
 import firebase from '../Firebase/Firebase_Config';
 import {
-    Link
+    Link,Redirect
   } from "react-router-dom";
+import { analytics } from 'firebase';
 
 class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             date : new Date(),
-            allUsers : []
+            allUsers : [],
+            login : false,
+            user : {}
         };
     }
 
@@ -82,22 +85,89 @@ class Login extends React.Component {
                 footer: "<a href='#' title='"+validationResult.information+"'>Why do I have this issue?</a>"
               })
         }else{
-            this.swtoast("success", "Signed in successfully");
+            this.setState({login : true},()=>{
+                this.swtoast("success", "Welcome, "+this.state.user.firstname);
+            });
         }
+    }
+
+    forgotPassword = (e) => {
+        e.preventDefault();
+        let securityQuestion,securityAnswer,password;
+        console.log(this.state.allUsers);
+        Swal.queue([{
+        title: 'Security Verification',
+        confirmButtonText: 'Confirm',
+        input: 'text',
+        inputValidator: (value) => {
+            if (!value) {
+              return 'You need to write something!'
+            }else{
+              let isValid = false;
+              this.state.allUsers.forEach((account)=>{
+                 if(account.email === value){
+                    securityQuestion = account.securityquestion;
+                    securityAnswer = account.securityanswer;
+                    password = account.password;
+                    isValid = true;
+                 }
+              });
+              if(!isValid){
+                  return 'Your mail id is not registered in our system'
+              }
+            }
+        },
+        text: 'Please type your registered mail id',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            Swal.queue([{
+                title: 'Security Verification',
+                confirmButtonText: 'Confirm',
+                input: 'text',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to write something!'
+                    }else{
+                        if(securityAnswer !== value){
+                            return 'Wrong answer'
+                        }
+                    }
+                },
+                text: securityQuestion,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    Swal.fire({
+                        icon: 'success',
+                        html: 'Your password is : <strong>'+password+'</strong>',
+                        footer: "<a href='#'>Don't share your password to anyone</a>"
+                      })
+                }
+            }]);
+          }
+        }])
+    }
+
+    skipSignIn = () =>{
+        this.swtoast("success", "Welcome, Guest User!");
+        this.setState({login : true});
     }
 
     validateAccount = (userName, passWord) => {
         let obj = {isValid:false,title:"Oops...",text:"This account is not registered",buttontext:"Register",information:"Your account is not registered. Please click the Register link to sign in"};
+        let userDetails;
         this.state.allUsers.forEach((account)=>{
             if(account.username === userName || account.email === userName){
                 obj = {isValid:false,title:"Oops...",text:"The password is incorrect",buttontext:"Forgot password",information:"Your account password is Incorrect. Please click the Forgot the password link to change password"};
                 if(account.password === passWord){
                     obj = {isValid:true,title:"Success",text:"Login success",buttontext:"",information:""};
+                    userDetails = account;
                 }
             }
         });
+        this.setState({user : userDetails});
         return obj;
     }
+
     render(){
         return(
             <React.Fragment>
@@ -124,14 +194,17 @@ class Login extends React.Component {
                         </div>
                         <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" onClick={this.signin.bind(this)}>Sign in</button>
                     </form>
-                    <Link to="/Dashboard" className="Register-account">Skip Login</Link>
-                    <a href="#" className="forgot-password">
+                    <a href="#" className="Register-account" onClick={this.skipSignIn.bind(this)}>
+                       Skip Login
+                    </a>
+                    <a href="#" className="forgot-password" onClick={this.forgotPassword.bind(this)}>
                         Forgot the password?
                     </a>
                     <Link to="/Registration" className="Register-account">New user? Register</Link>
                   </div>
                 </div>
             </div>
+            {(this.state.login) ? <Redirect to={{pathname:"/Dashboard",user:this.state.user}} push></Redirect> : ""}
         </React.Fragment>
         );
     }
