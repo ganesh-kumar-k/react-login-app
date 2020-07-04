@@ -1,23 +1,23 @@
 {
   "files": {
     "main.css": "/react-login-app/static/css/main.7c674340.chunk.css",
-    "main.js": "/react-login-app/static/js/main.f8b9c1fe.chunk.js",
-    "main.js.map": "/react-login-app/static/js/main.f8b9c1fe.chunk.js.map",
+    "main.js": "/react-login-app/static/js/main.69fe65d9.chunk.js",
+    "main.js.map": "/react-login-app/static/js/main.69fe65d9.chunk.js.map",
     "runtime-main.js": "/react-login-app/static/js/runtime-main.94a58a48.js",
     "runtime-main.js.map": "/react-login-app/static/js/runtime-main.94a58a48.js.map",
-    "static/js/2.120bd3b8.chunk.js": "/react-login-app/static/js/2.120bd3b8.chunk.js",
-    "static/js/2.120bd3b8.chunk.js.map": "/react-login-app/static/js/2.120bd3b8.chunk.js.map",
+    "static/js/2.7a5e0ce7.chunk.js": "/react-login-app/static/js/2.7a5e0ce7.chunk.js",
+    "static/js/2.7a5e0ce7.chunk.js.map": "/react-login-app/static/js/2.7a5e0ce7.chunk.js.map",
     "index.html": "/react-login-app/index.html",
-    "precache-manifest.061e8b6546821272aad7407def847ffa.js": "/react-login-app/precache-manifest.061e8b6546821272aad7407def847ffa.js",
+    "precache-manifest.554fd9efca44f8df64c4ee4ab051f845.js": "/react-login-app/precache-manifest.554fd9efca44f8df64c4ee4ab051f845.js",
     "service-worker.js": "/react-login-app/service-worker.js",
     "static/css/main.7c674340.chunk.css.map": "/react-login-app/static/css/main.7c674340.chunk.css.map",
-    "static/js/2.120bd3b8.chunk.js.LICENSE.txt": "/react-login-app/static/js/2.120bd3b8.chunk.js.LICENSE.txt",
+    "static/js/2.7a5e0ce7.chunk.js.LICENSE.txt": "/react-login-app/static/js/2.7a5e0ce7.chunk.js.LICENSE.txt",
     "static/media/font-awesome.css": "/react-login-app/static/media/fa-solid-900.d6d8d5da.woff2"
   },
   "entrypoints": [
     "static/js/runtime-main.94a58a48.js",
-    "static/js/2.120bd3b8.chunk.js",
+    "static/js/2.7a5e0ce7.chunk.js",
     "static/css/main.7c674340.chunk.css",
-    "static/js/main.f8b9c1fe.chunk.js"
+    "static/js/main.69fe65d9.chunk.js"
   ]
 }
