@@ -6,6 +6,7 @@ import {
     Link,Redirect
   } from "react-router-dom";
 import { analytics } from 'firebase';
+import swal from 'sweetalert';
 
 class Login extends React.Component {
     constructor(props) {
@@ -16,14 +17,6 @@ class Login extends React.Component {
             login : false,
             user : {}
         };
-    }
-
-    componentDidMount = () => {
-        firebase.firestore().collection('users').onSnapshot((snapshot)=>{
-            snapshot.docs.map((user)=>{
-                this.state.allUsers.push(user.data());
-            });
-        });
     }
 
     fieldValidation = () => {
@@ -68,7 +61,7 @@ class Login extends React.Component {
         });
     }
 
-    signin = (event) => {
+    signin = async (event) => {
         event.preventDefault();
         const fieldvalidation = this.fieldValidation();
         if(!fieldvalidation){
@@ -76,7 +69,7 @@ class Login extends React.Component {
         }
         let userName = document.getElementById("inputEmailUserName").value;
         let passWord = document.getElementById("inputPassword").value;
-        const validationResult = this.validateAccount(userName,passWord);
+        const validationResult = await this.validateAccount(userName,passWord);
         if(!validationResult.isValid){
             Swal.fire({
                 icon: 'error',
@@ -94,24 +87,25 @@ class Login extends React.Component {
     forgotPassword = (e) => {
         e.preventDefault();
         let securityQuestion,securityAnswer,password;
-        console.log(this.state.allUsers);
         Swal.queue([{
         title: 'Security Verification',
         confirmButtonText: 'Confirm',
         input: 'text',
-        inputValidator: (value) => {
+        inputValidator: async (value) => {
             if (!value) {
               return 'You need to write something!'
             }else{
               let isValid = false;
-              this.state.allUsers.forEach((account)=>{
-                 if(account.email === value){
-                    securityQuestion = account.securityquestion;
-                    securityAnswer = account.securityanswer;
-                    password = account.password;
+              Swal.enableLoading();
+              const checkUser = await firebase.firestore().collection('users').where("email","==",value).get();
+              console.log(checkUser);
+              checkUser.forEach((doc)=>{
+                    securityQuestion = doc.data().securityquestion;
+                    securityAnswer = doc.data().securityanswer;
+                    password = doc.data().password;
                     isValid = true;
-                 }
               });
+              Swal.disableLoading();
               if(!isValid){
                   return 'Your mail id is not registered in our system'
               }
@@ -119,7 +113,7 @@ class Login extends React.Component {
         },
         text: 'Please type your registered mail id',
         showLoaderOnConfirm: true,
-        preConfirm: () => {
+        preConfirm: async (data) => {
             Swal.queue([{
                 title: 'Security Verification',
                 confirmButtonText: 'Confirm',
@@ -139,7 +133,7 @@ class Login extends React.Component {
                     Swal.fire({
                         icon: 'success',
                         html: 'Your password is : <strong>'+password+'</strong>',
-                        footer: "<a href='#'>Don't share your password to anyone</a>"
+                        footer: "<a href='#' style='color:red'>Don't share your password to anyone</a>"
                       })
                 }
             }]);
@@ -152,18 +146,22 @@ class Login extends React.Component {
         this.setState({login : true});
     }
 
-    validateAccount = (userName, passWord) => {
+    validateAccount = async (userName, passWord) => {
         let obj = {isValid:false,title:"Oops...",text:"This account is not registered",buttontext:"Register",information:"Your account is not registered. Please click the Register link to sign in"};
         let userDetails;
-        this.state.allUsers.forEach((account)=>{
-            if(account.username === userName || account.email === userName){
+        const userNameFilter = await firebase.firestore().collection('users').where("username","==",userName).get();
+        const userEmailFilter = await firebase.firestore().collection('users').where("email","==",userName).get();
+        if(!userNameFilter.empty || !userEmailFilter.empty){
+            let userData = (!userNameFilter.empty) ? userNameFilter : userEmailFilter;
+            userData.forEach(doc=>{
                 obj = {isValid:false,title:"Oops...",text:"The password is incorrect",buttontext:"Forgot password",information:"Your account password is Incorrect. Please click the Forgot the password link to change password"};
-                if(account.password === passWord){
+                if(doc.data().password === passWord){
                     obj = {isValid:true,title:"Success",text:"Login success",buttontext:"",information:""};
-                    userDetails = account;
+                    userDetails = doc.data();
                 }
-            }
-        });
+                console.log(doc.data());
+            });
+        }
         this.setState({user : userDetails});
         return obj;
     }

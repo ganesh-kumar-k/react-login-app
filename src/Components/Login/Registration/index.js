@@ -5,6 +5,7 @@ import {
   Redirect
 } from "react-router-dom";
 import firebase from '../../Firebase/Firebase_Config';
+import moment from 'moment';
 import Swal from 'sweetalert2';
 
 class Registration extends React.Component{
@@ -12,29 +13,10 @@ class Registration extends React.Component{
     super(props);
     this.state = {
       countries : ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cruise Ship","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyz Republic","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Satellite","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","South Africa","South Korea","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","St. Lucia","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Uganda","Ukraine","United Arab Emirates","United Kingdom","Uruguay","Uzbekistan","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"],
-      allUserNames : [],
+      mobileNo : "",
       allUserMails : [],
       redirect : false
     }
-  }
-
-  componentDidMount = ()=> {
-      let usernames = [];
-      let usermails = [];
-      firebase.firestore().collection('users').onSnapshot((snapshot)=>{
-        snapshot.docs.map((user,index)=>{
-            let data = user.data();
-            if(data.username){
-                usernames.push(data.username);
-            }
-            if(data.email){
-                usermails.push(data.email)
-            }
-            if(snapshot.docs.length === (index+1)){
-                this.setState({allUserMails:usermails,allUserNames:usernames});
-            }
-        });
-      });
   }
 
   swtoast = (icon, title) => {
@@ -56,12 +38,13 @@ class Registration extends React.Component{
     });
   }
 
-  fieldValidation = (level) => {
+  fieldValidation = async (level) => {
     let obj = {
         isValid : true,
         icon : "warning",
         text : ""
     };
+    let dupUserName,dupMail;
     let fields = ["_fn","_ln","_pass","_conpass","_country","_un","_mail","_phone","_ques","_ans"];
     let focusField, count = 0;
     fields.forEach((field)=>{
@@ -89,27 +72,39 @@ class Registration extends React.Component{
         }
     }
     if(obj.isValid){
-        let username = document.getElementById(level+"_un");
-        if(this.state.allUserNames.indexOf(username.value) > -1){
-            username.classList.add("border-danger");
-            focusField = username;
-            obj.isValid = false;
-            obj.text = "Username already exists";
-        }
-    }
-    if(obj.isValid){
         let mail = document.getElementById(level+"_mail");
         let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if(this.state.allUserMails.indexOf(mail.value) > -1){
-            mail.classList.add("border-danger");
-            focusField = mail;
-            obj.isValid = false;
-            obj.text = "Mail is already registered";
-        }else if(!regex.test(mail.value)){
+        if(!regex.test(mail.value)){
             mail.classList.add("border-danger");
             focusField = mail;
             obj.isValid = false;
             obj.text = "Invalid email";
+        }
+    }
+    let username = document.getElementById(level+"_un");
+    let mail = document.getElementById(level+"_mail");
+    if(obj.isValid){
+        dupMail = await firebase.firestore().collection('users').where("email","==",mail.value).get();
+        dupUserName = await firebase.firestore().collection('users').where("username","==",username.value).get();
+    }
+    if(obj.isValid){
+        if(!dupUserName.empty){
+            username.classList.add("border-danger");
+            focusField = username;
+            obj.isValid = false;
+            obj.text = "Username already registered";
+        }
+        if(!dupMail.empty){
+            let field = mail;
+            let text = "Mail is already registered";
+            if(!obj.isValid){
+                field = username;
+                text = "Username and Mail are already registered"
+            }
+            mail.classList.add("border-danger");
+            focusField = field;
+            obj.isValid = false;
+            obj.text = text;
         }
     }
     if(!obj.isValid){
@@ -119,15 +114,32 @@ class Registration extends React.Component{
     return obj.isValid;
   }
 
+  onChange = (e) => {
+    const re = /^[0-9\b]+$/;
+    if (e.target.value === '' || re.test(e.target.value)) {
+       this.setState({mobileNo: e.target.value})
+    }
+  }
+
+  generateUserId = (fnID,lnID) => {
+      let fn = document.getElementById(fnID).value.toString().toUpperCase();
+      let ln = document.getElementById(lnID).value.toString().toUpperCase();
+      let id = moment().format('YYYYMMDDhhmmssSSS');
+      let userID = fn.charAt(0)+ln.charAt(0)+"-"+id;
+      return userID;
+  }
+
   registerUser = async (event, level) => {
     event.preventDefault();
-    const fieldValidation = this.fieldValidation(level);
+    const fieldValidation = await this.fieldValidation(level);
     if(!fieldValidation){
         return false;
     }
     let sel = document.getElementById(level+"_ques");
     let ques = sel.options[sel.selectedIndex].text;
-    firebase.firestore().collection('users').add({
+    let userID = this.generateUserId(`${level+"_fn"}`,`${level+"_ln"}`);
+    firebase.firestore().collection('users').doc(userID).set({
+        userid : userID,
         firstname : document.getElementById(level+"_fn").value,
         lastname : document.getElementById(level+"_ln").value,
         email : document.getElementById(level+"_mail").value,
@@ -231,7 +243,7 @@ class Registration extends React.Component{
                                             <input type="email" className="form-control" id="user_mail" placeholder="Your Email *"  />
                                         </div>
                                         <div className="form-group">
-                                            <input type="text" minlength="10" maxlength="10" name="txtEmpPhone" id="user_phone" className="form-control" placeholder="Your Phone *"  />
+                                            <input type="text" minlength="8" maxlength="15" name="txtEmpPhone" id="user_phone" className="form-control" placeholder="Your Phone *" value={this.state.mobileNo} onChange={this.onChange}/>
                                         </div>
                                         <div className="form-group">
                                             <select className="form-control" id="user_ques">
@@ -263,7 +275,7 @@ class Registration extends React.Component{
                                             <input type="email" className="form-control" id="admin_mail" placeholder="Email *"  />
                                         </div>
                                         <div className="form-group">
-                                            <input type="text" maxlength="10" minlength="10" className="form-control" id="admin_phone" placeholder="Phone *"  />
+                                            <input type="text" maxlength="8" minlength="15" className="form-control" id="admin_phone" placeholder="Phone *" value={this.state.mobileNo} onChange={this.onChange}/>
                                         </div>
                                         <div className="form-group">
                                             <select className="form-control" id="admin_country">
