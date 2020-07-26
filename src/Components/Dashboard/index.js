@@ -3,7 +3,7 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
-import Swal from 'sweetalert2';
+import firebase from '../Firebase/Firebase_Config';
 
 import Main from './main';
 import './assets/dashboard.css';
@@ -15,18 +15,38 @@ export default class Dashboard extends React.Component{
         super(props);
         this.state = {
           user : this.props.location.user,
-          login : true
+          login : true,
+          todos : []
         }
     }
 
     componentDidMount = () => {
-      console.log(this.state.user);
+      this.getTodos();
+    }
+
+    getTodos = async () =>{
+      try{
+        const todosResult = await firebase.firestore().collection('todos').where("userid","==",this.state.user.userid).get();
+        let allTodos = [];
+        todosResult.forEach((todo)=>{
+          let todosObj = {};
+          todosObj = todo.data();
+          todosObj["id"] = todo.id;
+          allTodos.push(todosObj);
+        });
+        this.setState({todos:allTodos});
+      }catch(ex){
+        console.error("Error while getting todos:-"+ex.message);
+      }
     }
 
     render(){
         return(
           <React.Fragment>
-            <Main user={this.state.user}></Main>
+            <Main 
+              user={this.state.user}
+              todo={this.state.todos}
+            ></Main>
             {/* <!-- Scroll to Top Button--> */}
             <a class="scroll-to-top rounded" href="#page-top">
               <i class="fas fa-angle-up"></i>

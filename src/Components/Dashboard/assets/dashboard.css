@@ -10571,14 +10571,14 @@ a:focus {
   }
 }
 
-.chart-pie {
+.todo-div {
   position: relative;
   height: 15rem;
   width: 100%;
 }
 
 @media (min-width: 768px) {
-  .chart-pie {
+  .todo-div {
     height: calc(20rem - 43px) !important;
   }
 }
@@ -10995,4 +10995,13 @@ footer.sticky-footer .copyright {
 
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
+}
+
+.ul-todo {
+  border-left: 1px solid #dddfeb;
+  border-right: 1px solid #dddfeb;
+  height: 13rem;
+}
+.ul-todo .list-group-item{
+  padding: 0.45rem 1.25rem;
 }

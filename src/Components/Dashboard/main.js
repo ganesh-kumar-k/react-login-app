@@ -1,5 +1,6 @@
 import React from 'react';
 import Swal from 'sweetalert2';
+import TodoList from "./Todo/TodoList";
 import SideBar from './sidebar';
 import Footer from './footer';
 
@@ -350,18 +351,21 @@ const Main = (props) => {
                     </div>
                     {/* Card Body */}
                     <div className="card-body">
-                      <div className="chart-pie pt-4 pb-2"><div className="chartjs-size-monitor"><div className="chartjs-size-monitor-expand"><div className /></div><div className="chartjs-size-monitor-shrink"><div className /></div></div>
-                        <canvas id="myPieChart" width={301} height={245} className="chartjs-render-monitor" style={{display: 'block', width: '301px', height: '245px'}} />
+                      <div className="todo-div">
+                        <TodoList 
+                          todo={props.todo}
+                          user={props.user}
+                        />
                       </div>
                       <div className="mt-4 text-center small">
                         <span className="mr-2">
-                          <i className="fas fa-circle text-primary" /> Direct
+                          <i className="fas fa-circle text-info" /> Low
                         </span>
                         <span className="mr-2">
-                          <i className="fas fa-circle text-success" /> Social
+                          <i className="fas fa-circle text-warning" /> Medium
                         </span>
                         <span className="mr-2">
-                          <i className="fas fa-circle text-info" /> Referral
+                          <i className="fas fa-circle text-danger" /> High
                         </span>
                       </div>
                     </div>

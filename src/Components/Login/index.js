@@ -5,8 +5,6 @@ import firebase from '../Firebase/Firebase_Config';
 import {
     Link,Redirect
   } from "react-router-dom";
-import { analytics } from 'firebase';
-import swal from 'sweetalert';
 
 class Login extends React.Component {
     constructor(props) {
@@ -98,7 +96,6 @@ class Login extends React.Component {
               let isValid = false;
               Swal.enableLoading();
               const checkUser = await firebase.firestore().collection('users').where("email","==",value).get();
-              console.log(checkUser);
               checkUser.forEach((doc)=>{
                     securityQuestion = doc.data().securityquestion;
                     securityAnswer = doc.data().securityanswer;
@@ -159,7 +156,6 @@ class Login extends React.Component {
                     obj = {isValid:true,title:"Success",text:"Login success",buttontext:"",information:""};
                     userDetails = doc.data();
                 }
-                console.log(doc.data());
             });
         }
         this.setState({user : userDetails});
@@ -168,7 +164,7 @@ class Login extends React.Component {
 
     render(){
         return(
-            <React.Fragment>
+            <div style={{textAlign:"center"}}>
              <div className="sidenav">
                 <div className="login-main-text">
                     <h2>Application<br/> Login Page</h2>
@@ -192,9 +188,9 @@ class Login extends React.Component {
                         </div>
                         <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" onClick={this.signin.bind(this)}>Sign in</button>
                     </form>
-                    <a href="#" className="Register-account" onClick={this.skipSignIn.bind(this)}>
+                    {/* <a href="#" className="Register-account" onClick={this.skipSignIn.bind(this)}>
                        Skip Login
-                    </a>
+                    </a> */}
                     <a href="#" className="forgot-password" onClick={this.forgotPassword.bind(this)}>
                         Forgot the password?
                     </a>
@@ -203,7 +199,7 @@ class Login extends React.Component {
                 </div>
             </div>
             {(this.state.login) ? <Redirect to={{pathname:"/Dashboard",user:this.state.user}} push></Redirect> : ""}
-        </React.Fragment>
+        </div>
         );
     }
 }
