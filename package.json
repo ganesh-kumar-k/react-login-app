@@ -23,7 +23,7 @@
     "react-scripts": "3.4.1",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^9.14.0",
-    "systeminformation": "^4.26.9"
+    "systeminformation": "^5.3.1"
   },
   "scripts": {
     "predeploy": "npm run build",
